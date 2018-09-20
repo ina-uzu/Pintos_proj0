@@ -58,8 +58,9 @@ int main(){
 				
 				for(e= list_begin(&List[index]); e!=list_end(&List[index]); e = list_next(e)){
 					struct list_node* node = list_entry(e,struct list_node, elem);
-					printf("item %d\n", node->data);
+					printf("%d ", node->data);
 				}
+				printf("\n");
 			}
 		}
 
@@ -70,14 +71,11 @@ int main(){
 			sscanf(command[2], "%d", &node_data);
 
 			//create new list item
-			struct list_elem* back = list_end(&List[index]);
+			struct list_elem* back = (struct list_elem*)malloc(sizeof(struct list_elem));;
 			struct list_node* node = list_entry(back, struct list_node, elem);
 			node->data = node_data;
 
 			list_push_back(&List[index],back);
-			
-			int temp = (int)list_size(&List[index]);
-			printf("Node data %d  List Size is %d\n", node->data, temp);
 		}
 
 		else if( !strcmp(command[0], "list_push_front") && token_cnt==3){
@@ -86,13 +84,21 @@ int main(){
 			sscanf(command[2], "%d", &node_data);
 
 			//create new list item
-			struct list_elem* front = list_begin(&List[index]);
+			struct list_elem* front = (struct list_elem*)malloc(sizeof(struct list_elem));
 			struct list_node* node = list_entry(front, struct list_node, elem);
 			node->data = node_data;
 			
 			list_push_front(&List[index], front);
-
 		}
+
+		else if( !strcmp(command[0], "list_max") && token_cnt ==2){
+			int index = command[1][4]-'0';
+		}
+
+		else if( !strcmp(command[0], "list_max") && token_cnt ==2){
+			int index = command[1][4]-'0';
+		}
+	
 	}
 	
 	return 0;
