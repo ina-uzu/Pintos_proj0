@@ -4,11 +4,20 @@
 #include "list.h"
 #include "bitmap.h"
 #include "hash.h"
+#include "console.h"
 
 char** tokenize_str(char* str, int* token_cnt);
 
+struct list List[10];
+
+struct list_node{
+	struct list_elem elem;
+	int data;
+};
+
 int main(){
-	int token_cnt;
+	int type;
+	int token_cnt, obj_cnt=0;
 	int i;
 	char command_str[256];	//사용자로부터 입력받는 명령어
 	char** command;	//command_str을 공백단위로 쪼갠 문자열 배열
@@ -18,19 +27,74 @@ int main(){
 	while(1){	
 
 		fgets(command_str,sizeof(command_str),stdin);	
-		
-		if( strcmp(command_str,"quit")==0){
+		command=tokenize_str(command_str,&token_cnt);
+
+		//QUIT
+		if(!strcmp(command[0],"quit")){
 			printf("Bye~ ina!\n");
 			break;
 		}
 		
-		command=tokenize_str(command_str,&token_cnt);
+		//CREATE
+		if( !strcmp(command[0], "create")&& token_cnt==3 ){
+			if( !strcmp(command[1], "list")){
+				if(obj_cnt<=10){
+					type=LIST;
+					list_init(&List[obj_cnt]);	
+					obj_cnt++;
+				}
+				else{
+					printf("Maximum Number of List is 10\n");
+				}
+			}
+		}
 
-		for(i=0; i<token_cnt; i++){
-			printf("%s\n", command[i]);
+		//DUMPDATA
+		else if( !strcmp(command[0], "dumpdata")&& token_cnt==2){
+			//LIST
+			if(type==LIST){
+				int index=command[1][4]-'0';
+				struct list_elem* e;
+				
+				for(e= list_begin(&List[index]); e!=list_end(&List[index]); e = list_next(e)){
+					struct list_node* node = list_entry(e,struct list_node, elem);
+					printf("item %d\n", node->data);
+				}
+			}
+		}
+
+		//LIST_PUSH_BACK
+		else if( !strcmp(command[0], "list_push_back") && token_cnt==3){
+			int index = command[1][4]-'0';
+			int node_data;
+			sscanf(command[2], "%d", &node_data);
+
+			//create new list item
+			struct list_elem* back = list_end(&List[index]);
+			struct list_node* node = list_entry(back, struct list_node, elem);
+			node->data = node_data;
+
+			list_push_back(&List[index],back);
+			
+			int temp = (int)list_size(&List[index]);
+			printf("Node data %d  List Size is %d\n", node->data, temp);
+		}
+
+		else if( !strcmp(command[0], "list_push_front") && token_cnt==3){
+			int index = command[1][4]-'0';
+			int node_data;
+			sscanf(command[2], "%d", &node_data);
+
+			//create new list item
+			struct list_elem* front = list_begin(&List[index]);
+			struct list_node* node = list_entry(front, struct list_node, elem);
+			node->data = node_data;
+			
+			list_push_front(&List[index], front);
+
 		}
 	}
-
+	
 	return 0;
 
 }

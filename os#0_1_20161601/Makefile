@@ -3,7 +3,7 @@ CC=gcc
 testlib : console.o list.o bitmap.o hash.o
 	gcc -g -o testlib console.o list.o bitmap.o hash.o
 
-console.o : console.c list.h bitmap.h hash.h
+console.o : console.c console.h list.h bitmap.h hash.h
 	gcc -c console.c 
 
 list.o : list.h debug.h
