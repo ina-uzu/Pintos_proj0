@@ -67,7 +67,7 @@ int main(){
 			//LIST
 			if(type==LIST){
 				int index=command[1][4]-'0';
-	
+
 				if(!list_empty(&List[index])){
 					struct list_elem* e;
 
@@ -76,6 +76,42 @@ int main(){
 						printf("%d ", node->data);
 					}
 					printf("\n");
+				}
+			}
+		}
+
+		//LIST_INSERT
+		else if( !strcmp(command[0], "list_insert") && token_cnt==4){
+			int index= command[1][4]-'0';
+			int node_index, node_data;
+			sscanf(command[2], "%d", &node_index);
+			sscanf(command[3], "%d", &node_data);
+
+			if(!(unsigned)list_size(&List[index])<=node_index){
+
+				// create new node
+				struct list_elem* new_elem = (struct list_elem*)malloc(sizeof(struct list_elem));
+				struct list_node* node = list_entry(new_elem, struct list_node, elem);
+				node->data = node_data;
+
+
+				// push_front
+				if(node_index==0)
+					list_push_front(&List[index],new_elem);		
+
+				else if( node_index== ){
+					
+				}
+				else{
+
+					// get 'BEFORE' list_elem
+					struct list_elem* e;
+					int i=0;
+					for(e= list_begin(&List[index]); e!=list_end(&List[index]) || i<node_index; e = list_next(e) ){
+
+						i++;
+					}
+					list_insert();
 				}
 			}
 		}
@@ -118,6 +154,27 @@ int main(){
 		else if( !strcmp(command[0], "list_pop_front") && token_cnt==2){
 			int index = command[1][4]-'0';
 			list_pop_front(&List[index]);
+		}
+
+		//LIST_FRONT
+		else if( !strcmp(command[0], "list_front") && token_cnt==2){
+			int index = command[0][4]-'0';
+
+			struct list_elem* e = list_front(&List[index]);
+			struct list_node* node = list_entry(e,struct list_node, elem);
+
+			if( node!=NULL) 
+				printf("%d\n", node->data);
+		}
+
+		//LIST_BACK
+		else if( !strcmp(command[0], "list_back") && token_cnt==2){
+			int index = command[0][4]-'0';
+			struct list_elem* e = list_back(&List[index]);
+			struct list_node* node = list_entry(e, struct list_node, elem);
+
+			if( node!=NULL) 
+				printf("%d\n", node->data);
 		}
 
 
