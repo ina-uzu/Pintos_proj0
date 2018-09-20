@@ -34,7 +34,7 @@ int main(){
 			printf("Bye~ ina!\n");
 			break;
 		}
-		
+
 		//CREATE
 		if( !strcmp(command[0], "create")&& token_cnt==3 ){
 			if( !strcmp(command[1], "list")){
@@ -49,18 +49,34 @@ int main(){
 			}
 		}
 
+		//DELETE
+		else if( !strcmp(command[0], "delete") && token_cnt==2){
+			if( type==LIST){
+				int index = command[1][4]-'0';
+
+				while (!list_empty (&List[index]))
+				{
+					struct list_elem *e = list_pop_front (&List[index]);
+					free(e);
+				}
+			}
+		}
+
 		//DUMPDATA
 		else if( !strcmp(command[0], "dumpdata")&& token_cnt==2){
 			//LIST
 			if(type==LIST){
 				int index=command[1][4]-'0';
-				struct list_elem* e;
-				
-				for(e= list_begin(&List[index]); e!=list_end(&List[index]); e = list_next(e)){
-					struct list_node* node = list_entry(e,struct list_node, elem);
-					printf("%d ", node->data);
+	
+				if(!list_empty(&List[index])){
+					struct list_elem* e;
+
+					for(e= list_begin(&List[index]); e!=list_end(&List[index]); e = list_next(e)){
+						struct list_node* node = list_entry(e,struct list_node, elem);
+						printf("%d ", node->data);
+					}
+					printf("\n");
 				}
-				printf("\n");
 			}
 		}
 
@@ -78,6 +94,7 @@ int main(){
 			list_push_back(&List[index],back);
 		}
 
+		//LIST_PUSH_FRONT
 		else if( !strcmp(command[0], "list_push_front") && token_cnt==3){
 			int index = command[1][4]-'0';
 			int node_data;
@@ -87,20 +104,33 @@ int main(){
 			struct list_elem* front = (struct list_elem*)malloc(sizeof(struct list_elem));
 			struct list_node* node = list_entry(front, struct list_node, elem);
 			node->data = node_data;
-			
+
 			list_push_front(&List[index], front);
 		}
 
-		else if( !strcmp(command[0], "list_max") && token_cnt ==2){
+		//LIST_POP_BACK
+		else if( !strcmp(command[0], "list_pop_back") && token_cnt==2){
+			int index = command[1][4]-'0';
+			list_pop_back(&List[index]);
+		}
+
+		//LIST_POP_FRONT
+		else if( !strcmp(command[0], "list_pop_front") && token_cnt==2){
+			int index = command[1][4]-'0';
+			list_pop_front(&List[index]);
+		}
+
+
+		else if( !strcmp(command[0], "list_min") && token_cnt ==2){
 			int index = command[1][4]-'0';
 		}
 
 		else if( !strcmp(command[0], "list_max") && token_cnt ==2){
 			int index = command[1][4]-'0';
 		}
-	
+
 	}
-	
+
 	return 0;
 
 }
@@ -113,7 +143,7 @@ char** tokenize_str(char* str, int* token_cnt){
 
 	if(!str)
 		return NULL;
-	
+
 	//token 개수 구하기
 	strcpy(copy, str);
 	tmp = strtok(copy, " \n\r\t");
@@ -124,7 +154,7 @@ char** tokenize_str(char* str, int* token_cnt){
 		if(!tmp)
 			break;
 	}
-	
+
 	//token 개수 만큼 문자열 배열 할당
 	*token_cnt=cnt;
 	tokens = (char**)malloc(cnt*sizeof(char*));	
@@ -133,10 +163,10 @@ char** tokenize_str(char* str, int* token_cnt){
 
 	//배열 채우기
 	strcpy(copy, str);
-	
+
 	tmp = strtok(copy, " \n\r\t");
 	strcpy(tokens[0], tmp);
-	
+
 	for(i=1; i<cnt; i++){
 		tmp = strtok(NULL, " \n\r\t");
 		strcpy(tokens[i], tmp);
@@ -144,5 +174,3 @@ char** tokenize_str(char* str, int* token_cnt){
 
 	return tokens;
 }
-
-
