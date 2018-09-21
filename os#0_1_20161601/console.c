@@ -84,7 +84,7 @@ int main(){
 			}
 		}
 
-
+		//LIST_EMPTY
 		else if( !strcmp(command[0], "list_empty") && token_cnt==2){
 			int index = command[1][4]-'0';
 			if( list_empty(&List[index]))
@@ -93,6 +93,7 @@ int main(){
 				printf("false\n");
 		}
 
+		//LIST_SIZE
 		else if( !strcmp(command[0], "list_size") && token_cnt==2){
 			int index = command[1][4]-'0';
 			printf("%d\n", (int)list_size(&List[index]));
@@ -193,7 +194,7 @@ int main(){
 
 		//LIST_FRONT
 		else if( !strcmp(command[0], "list_front") && token_cnt==2){
-			int index = command[0][4]-'0';
+			int index = command[1][4]-'0';
 
 			struct list_elem* e = list_front(&List[index]);
 			struct list_node* node = list_entry(e,struct list_node, elem);
@@ -204,7 +205,7 @@ int main(){
 
 		//LIST_BACK
 		else if( !strcmp(command[0], "list_back") && token_cnt==2){
-			int index = command[0][4]-'0';
+			int index = command[1][4]-'0';
 			struct list_elem* e = list_back(&List[index]);
 			struct list_node* node = list_entry(e, struct list_node, elem);
 
