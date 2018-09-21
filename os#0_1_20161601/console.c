@@ -100,19 +100,16 @@ int main(){
 
 				if( Bitmap[index]!=NULL){
 					size_t cnt = bitmap_size(Bitmap[index]);
-					struct bitmap* bm = Bitmap[index];
 					size_t i;
 
-					/*
-					   for(i=0; i<cnt; i++){
-					   if( bit&1)
-					   printf("1");
-					   else
-					   printf("0");
-					   bit>>1;
-					   }*/
+					for(i=0; i<cnt; i++){
+						if(bitmap_test(Bitmap[index], i))
+							printf("1");
+						else
+							printf("0");
+					}
+					printf("\n");
 				}
-
 			}
 		}
 
@@ -390,10 +387,8 @@ int main(){
 			if( !strcmp(command[4],"true") )
 				value=true;
 			
-			if(bitmap_count(Bitmap[index], (size_t)start, (size_t)cnt, value) )
-				printf("true\n");
-			else
-				printf("false\n");
+			size_t count = bitmap_count(Bitmap[index], start, cnt, value);
+			printf("%d\n", (int)count);
 		}
 
 		//BITMAP_DUMP
@@ -453,7 +448,8 @@ int main(){
 			if( !strcmp(command[4],"true") )
 				value=true;
 
-			bitmap_scan_and_flip(Bitmap[index], start, cnt, value);	
+			size_t idx =  bitmap_scan_and_flip(Bitmap[index], start, cnt, value);	
+			printf("%u\n", (unsigned)idx);
 		}
 
 		//BITMAP_SCAN
@@ -467,7 +463,8 @@ int main(){
 			if( !strcmp(command[4],"true") )
 				value=true;
 
-			bitmap_scan(Bitmap[index], start, cnt, value);	
+			size_t idx= bitmap_scan(Bitmap[index], start, cnt, value);	
+			printf("%u\n", (unsigned)idx);
 		}
 
 		//BITMAP_SET_ALL
