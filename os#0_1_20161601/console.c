@@ -11,6 +11,12 @@ struct list_elem* n_th_elem(int index, int node_index);
 
 struct list List[10];
 struct bitmap* Bitmap[10];
+struct hash Hash[10];
+
+struct hash_node{
+	struct hash_elem elem;
+	int data;
+};
 
 struct list_node{
 	struct list_elem elem;
@@ -21,6 +27,17 @@ static bool list_less(const struct list_elem *a, const struct list_elem *b, void
 	struct list_node* anode =list_entry(a,struct list_node,elem);
 	struct list_node* bnode =list_entry(b,struct list_node,elem);
 	return anode->data < bnode ->data;
+}
+
+unsigned hash_hash(const struct hash_elem *a,void *aux){
+	struct hash_node* node = hash_entry(a,struct hash_node,elem);
+	return hash_int_2(node->data);
+}
+
+bool hash_less(const struct hash_elem *a, const struct hash_elem *b,void *aux){
+	struct hash_node *anode = hash_entry(a,struct hash_node,elem);
+	struct hash_node *bnode = hash_entry(b,struct hash_node,elem);
+	return anode->data < bnode->data;
 }
 
 int main(){
@@ -60,10 +77,18 @@ int main(){
 					Bitmap[obj_cnt++] = bitmap_create((size_t)len);
 				}
 			}
+
+			else if(!strcmp( command[1], "hashtable") && token_cnt==3){
+				if(obj_cnt<=10){
+					type=HASH;
+					hash_init(&Hash[obj_cnt++], hash_hash, hash_less, NULL);
+				}
+			}
 		}
 
 		//DELETE
 		else if( !strcmp(command[0], "delete") && token_cnt==2){
+			//LIST
 			if( type==LIST){
 				int index = command[1][4]-'0';
 
@@ -72,6 +97,12 @@ int main(){
 					struct list_elem *e = list_pop_front (&List[index]);
 					free(e);
 				}
+			}
+
+			//BITMAP
+			else if(type==BITMAP){
+				int index= command[1][2]-'0';
+				bitmap_destroy(Bitmap[index]);
 			}
 		}
 
