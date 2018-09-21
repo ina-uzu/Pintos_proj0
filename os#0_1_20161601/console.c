@@ -84,6 +84,19 @@ int main(){
 			}
 		}
 
+
+		else if( !strcmp(command[0], "list_empty") && token_cnt==2){
+			int index = command[1][4]-'0';
+			if( list_empty(&List[index]))
+				printf("true\n");
+			else
+				printf("false\n");
+		}
+
+		else if( !strcmp(command[0], "list_size") && token_cnt==2){
+			int index = command[1][4]-'0';
+			printf("%d\n", (int)list_size(&List[index]));
+		}
 		//LIST_INSERT
 		else if( !strcmp(command[0], "list_insert") && token_cnt==4){
 			int index= command[1][4]-'0';
@@ -198,13 +211,22 @@ int main(){
 				printf("%d\n", node->data);
 		}
 
-
+		
+		//LIST_MIN
 		else if( !strcmp(command[0], "list_min") && token_cnt ==2){
 			int index = command[1][4]-'0';
+			struct list_elem* e = list_min(&List[index], list_less, NULL);
+			struct list_node* node = list_entry(e, struct list_node, elem);
+			printf("%d\n", node->data);
 		}
 
+		//LIST_MAX
 		else if( !strcmp(command[0], "list_max") && token_cnt ==2){
 			int index = command[1][4]-'0';
+			struct list_elem* e = list_max(&List[index], list_less, NULL);
+			struct list_node* node = list_entry(e, struct list_node, elem);
+			printf("%d\n", node->data);
+	
 		}
 
 	}
