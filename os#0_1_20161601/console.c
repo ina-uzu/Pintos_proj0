@@ -12,6 +12,7 @@ struct list_elem* n_th_elem(int index, int node_index);
 struct list List[10];
 struct bitmap* Bitmap[10];
 struct hash Hash[10];
+struct hash_iterator hash_itr;
 
 struct hash_node{
 	struct hash_elem elem;
@@ -40,6 +41,23 @@ bool hash_less(const struct hash_elem *a, const struct hash_elem *b,void *aux){
 	return anode->data < bnode->data;
 }
 
+void destructor(struct hash_elem *a,void *aux){
+	struct hash_node *node=hash_entry(a,struct hash_node,elem);
+	node=NULL;
+}
+void square( struct hash_elem *a, void *aux){
+	struct hash_node *node=hash_entry(a,struct hash_node,elem);
+	node->data = (node->data)*(node->data);
+}
+
+void triple( struct hash_elem *a, void *aux){
+	struct hash_node *node=hash_entry(a,struct hash_node,elem);
+	node->data = (node->data)*(node->data)*(node->data);
+}
+void hash_print_all(struct hash_elem* a){
+	struct hash_node* node = hash_entry(a, struct hash_node, elem);
+	printf("%d ", node->data);
+}
 int main(){
 	int type;
 	int token_cnt, obj_cnt=0;
@@ -104,6 +122,11 @@ int main(){
 				int index= command[1][2]-'0';
 				bitmap_destroy(Bitmap[index]);
 			}
+
+			else{
+				int index=command[1][4]-'0';
+				hash_destroy(&Hash[index], destructor);
+			}
 		}
 
 		//DUMPDATA
@@ -141,6 +164,15 @@ int main(){
 					}
 					printf("\n");
 				}
+			}
+
+			//HASHTABLE
+			else if(type==HASH){
+				index = command[1][4]-'0';
+				if(hash_empty(&Hash[index]))
+					continue;
+				hash_apply(&Hash[index], hash_print_all);
+				printf("\n");
 			}
 		}
 
@@ -370,7 +402,7 @@ int main(){
 			unsigned start, cnt;
 			sscanf(command[2], "%u", &start);
 			sscanf(command[3], "%u", &cnt);
-			
+
 			if(bitmap_all(Bitmap[index], (size_t)start, (size_t)cnt))
 				printf("true\n");
 			else
@@ -383,12 +415,12 @@ int main(){
 			unsigned start, cnt;
 			sscanf(command[2], "%u", &start);
 			sscanf(command[3], "%u", &cnt);
-	
+
 			if(bitmap_any(Bitmap[index], (size_t)start, (size_t)cnt))
 				printf("true\n");
 			else
 				printf("false\n");
-		
+
 		}
 
 		//BITMAP_CONTAINS
@@ -400,7 +432,7 @@ int main(){
 			sscanf(command[3], "%u", &cnt);
 			if( !strcmp(command[4],"true") )
 				value=true;
-			
+
 			if(bitmap_contains(Bitmap[index], (size_t)start, (size_t)cnt, value) )
 				printf("true\n");
 			else
@@ -417,7 +449,7 @@ int main(){
 			sscanf(command[3], "%u", &cnt);
 			if( !strcmp(command[4],"true") )
 				value=true;
-			
+
 			size_t count = bitmap_count(Bitmap[index], start, cnt, value);
 			printf("%d\n", (int)count);
 		}
@@ -451,19 +483,19 @@ int main(){
 
 			sscanf(command[2], "%u", &start);
 			sscanf(command[3], "%u", &cnt);
-				
+
 			if(bitmap_none(Bitmap[index], (size_t)start, (size_t)cnt) )
 				printf("true\n");
 			else
 				printf("false\n");
-		
+
 		}
 
 		//BITMAP_RESET
 		else if( !strcmp( command[0], "bitmap_reset") && token_cnt==3){
 			int index = command[1][2]-'0';
 			unsigned bit_idx;
-	
+
 			sscanf(command[2], "%u", &bit_idx);
 			bitmap_reset(Bitmap[index], bit_idx);
 		}
@@ -502,7 +534,7 @@ int main(){
 		else if( !strcmp( command[0], "bitmap_set_all") && token_cnt== 3){
 			int index = command[1][2]-'0';
 			bool value=false;
-			
+
 			if( !strcmp(command[2],"true") )
 				value=true;
 
@@ -551,7 +583,98 @@ int main(){
 				printf("true\n");
 			else
 				printf("false\n");
+
+		}
+
+		//HASH_INSERT
+		else if( !strcmp( command[0], "hash_insert") && token_cnt==3){
+			int index= command[1][4]-'0';
+			int data;
+			sscanf(command[2], "%d", &data);
+			//Create new list item
+			struct hash_elem* new_elem = (struct hash_elem*)malloc(sizeof(struct hash_elem));
+			struct hash_node* node = hash_entry(new_elem, struct hash_node, elem);
+			node->data = data;
+
+			new_elem = hash_insert(&Hash[index], new_elem);
+		}
+		
+		//HASH_APPLY
+		else if( !strcmp( command[0], "hash_apply") && token_cnt==3){
+			int index = command[1][4]-'0';
 			
+			if( !strcmp( command[2], "triple"))
+				hash_apply(&Hash[index], triple);
+
+			else
+				hash_apply(&Hash[index], square);
+		}
+
+		//HAHS_EMPTY
+		else if( !strcmp( command[0], "hash_empty") && token_cnt==2){
+			int index = command[1][4]-'0';
+			if( hash_empty(&Hash[index]))
+				printf("true\n");
+			else
+				printf("false\n");
+		}
+
+		//HASH_SIZE
+		else if( !strcmp(command[0], "hash_size") && token_cnt==2){
+			int index = command[1][4] -'0';
+			size_t size = hash_size(&Hash[index]);
+
+			printf("%u\n", (unsigned)size);	
+		}
+
+		//HASH_CLEAR
+		else if( !strcmp( command[0], "hash_clear") && token_cnt==2){
+			int index = command[1][4]-'0';
+			hash_clear(&Hash[index], destructor);
+		}
+		
+		//HASH_FIND
+		else if( !strcmp(command[0], "hash_find") && token_cnt==3){
+			int index = command[1][4]-'0';
+			int value;
+			sscanf(command[2], "%d", &value);
+			
+			struct hash_elem* tmp = (struct hash_elem*)malloc(sizeof(struct hash_elem));
+			struct hash_node* tmp_node = hash_entry(tmp, struct hash_node, elem);
+			tmp_node->data = value;
+
+			struct hash_elem* e = hash_find( &Hash[index],tmp_node);
+			
+			if( e!=NULL){
+				printf("%d\n", value);
+			}
+		}
+	
+		else if( !strcmp(command[0], "hash_delete") && token_cnt==3){
+			int index = command[1][4]-'0';
+			int value;
+			sscanf(command[2], "%d", &value);
+			
+			struct hash_elem* tmp = (struct hash_elem*)malloc(sizeof(struct hash_elem));
+			struct hash_node* tmp_node = hash_entry(tmp, struct hash_node, elem);
+			tmp_node->data = value;
+
+			struct hash_elem* e = hash_delete( &Hash[index],tmp_node);
+		}
+
+
+		//HASH_REPLACE
+		else if( !strcmp( command[0], "hash_replace") && token_cnt==3){
+			int index = command[1][4]-'0';
+			int value;
+			sscanf(command[2], "%d", &value);
+			
+			struct hash_elem* tmp = (struct hash_elem*)malloc(sizeof(struct hash_elem));
+			struct hash_node* tmp_node = hash_entry(tmp, struct hash_node, elem);
+			tmp_node->data = value;
+			
+			hash_replace(&Hash[index], tmp_node);
+
 		}
 	
 	}
