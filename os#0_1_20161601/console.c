@@ -7,8 +7,8 @@
 #include "console.h"
 
 char** tokenize_str(char* str, int* token_cnt);
-struct list_elem* create_list_node(int data);
-
+struct list_elem* n_th_elem(int index, int node_index);
+	
 struct list List[10];
 
 struct list_node{
@@ -236,18 +236,7 @@ int main(){
 			int node_index, cur=0;
 			sscanf(command[2], "%d", &node_index);
 
-			//Pop back
-			if( node_index == (int)list_size(&List[index])-1)
-				list_pop_back(&List[index]);
-
-			struct list_elem* e;
-			for( e= list_begin(&List[index]); e!= list_end(&List[index]); e= list_next(e)){
-				if(cur==node_index){
-					list_remove(e);
-					break;
-				}
-				cur++;
-			}
+			list_remove(n_th_elem(index, node_index));
 		}
 
 		//LIST_REVERSE
@@ -260,6 +249,51 @@ int main(){
 		else if( !strcmp(command[0], "list_sort") && token_cnt==2){
 			int index = command[1][4]-'0';
 			list_sort(&List[index], list_less, NULL);
+		}
+
+		//LIST_SPLICE
+		else if( !strcmp( command[0], "list_splice") && token_cnt==6){
+			int index1, index2;
+			int before, first , last;
+			int cur=0;
+
+			index1=command[1][4]-'0';
+			index2=command[3][4]-'0';
+			sscanf(command[2], "%d", &before);
+			sscanf(command[4], "%d", &first);
+			sscanf(command[5], "%d", &last);
+
+			struct list_elem* e, *e_before=NULL;
+			struct list_elem *e_first=NULL, *e_last=NULL;
+			
+			e_before = n_th_elem(index1, before);
+			e_first = n_th_elem(index2, first);
+			e_last = n_th_elem(index2, last);
+			list_splice(e_before, e_first, e_last);
+		}
+
+		//LIST_SWAP
+		else if( !strcmp(command[0], "list_swap") && token_cnt==4){
+			int index= command[1][4]-'0';
+			int node1, node2;
+			sscanf(command[2], "%d", &node1);
+			sscanf(command[3], "%d", &node2);
+			list_swap(n_th_elem(index, node1), n_th_elem(index, node2));
+		}
+
+		//LIST_UNIQUE
+		else if( !strcmp(command[0], "list_unique")&& ( token_cnt==3 || token_cnt==2)){
+			int index1=command[1][4]-'0';
+			int index2;
+
+			if( token_cnt==2)
+				list_unique(&List[index1], NULL, list_less, NULL);
+			
+			else{
+				index2=command[2][4]-'0';
+				list_unique(&List[index1], &List[index2], list_less, NULL);
+			}
+
 		}
 	}
 
@@ -307,6 +341,20 @@ char** tokenize_str(char* str, int* token_cnt){
 	return tokens;
 }
 
+struct list_elem* n_th_elem(int index, int node_index){
+	int cur=0;
+	
+	struct list_elem* e;
+	for( e= list_begin(&List[index]); e!= list_end(&List[index]); e= list_next(e)){
+		if(cur==node_index){
+			break;
+		}
+		cur++;
+	}
+	
+	return e;
+
+}
 struct list_elem* create_list_node(int data){
 	struct list_elem* e= (struct list_elem*)malloc(sizeof(struct list_elem));
 	struct list_node* node = list_entry(e,struct list_node, elem);
