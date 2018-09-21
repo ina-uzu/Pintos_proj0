@@ -377,8 +377,155 @@ int main(){
 				printf("true\n");
 			else
 				printf("false\n");
-
 		}
+
+		//BITMAP_COUNT
+		else if( !strcmp(command[0], "bitmap_count") && token_cnt ==5){
+			int index = command[1][2]-'0';
+			unsigned start, cnt;
+			bool value=false;
+
+			sscanf(command[2], "%d", &start);
+			sscanf(command[3], "%d", &cnt);
+			if( !strcmp(command[4],"true") )
+				value=true;
+			
+			if(bitmap_count(Bitmap[index], (size_t)start, (size_t)cnt, value) )
+				printf("true\n");
+			else
+				printf("false\n");
+		}
+
+		//BITMAP_DUMP
+		else if( !strcmp( command[0], "bitmap_dump") && token_cnt==2){
+			int index = command[1][2]-'0';
+			bitmap_dump(Bitmap[index]);
+		}
+
+		//BITMAP_EXPAND
+		else if( !strcmp( command[0],"bitmap_expand") && token_cnt==3){
+			int index = command[1][2]-'0';
+			unsigned cnt;
+			sscanf(command[2], "%d", &cnt);
+			bitmap_expand(Bitmap[index], cnt);
+		}
+
+		//BITMAP_FLIP
+		else if(!strcmp( command[0], "bitmap_flip") && token_cnt==3){
+			int index = command[1][2]-'0';
+			unsigned cnt;
+			sscanf(command[2], "%d", &cnt);
+			bitmap_flip(Bitmap[index], cnt);
+		}
+
+		//BITMAP_NONE
+		else if( !strcmp( command[0], "bitmap_none") && token_cnt ==4){
+			int index = command[1][2]-'0';
+			unsigned start, cnt;
+
+			sscanf(command[2], "%d", &start);
+			sscanf(command[3], "%d", &cnt);
+				
+			if(bitmap_none(Bitmap[index], (size_t)start, (size_t)cnt) )
+				printf("true\n");
+			else
+				printf("false\n");
+		
+		}
+
+		//BITMAP_RESET
+		else if( !strcmp( command[0], "bitmap_reset") && token_cnt==3){
+			int index = command[1][2]-'0';
+			unsigned bit_idx;
+	
+			sscanf(command[2], "%d", &bit_idx);
+			bitmap_reset(Bitmap[index], bit_idx);
+		}
+
+		//BITMAP_SCAN_AND_FLIP
+		else if( !strcmp( command[0], "bitmap_scan_and_flip") && token_cnt==5){
+			int index = command[1][2]-'0';
+			unsigned start, cnt;
+			bool value=false;
+
+			sscanf(command[2], "%d", &start);
+			sscanf(command[3], "%d", &cnt);
+			if( !strcmp(command[4],"true") )
+				value=true;
+
+			bitmap_scan_and_flip(Bitmap[index], start, cnt, value);	
+		}
+
+		//BITMAP_SCAN
+		else if( !strcmp( command[0], "bitmap_scan") &&  token_cnt==5){
+			int index = command[1][2]-'0';
+			unsigned start, cnt;
+			bool value=false;
+
+			sscanf(command[2], "%d", &start);
+			sscanf(command[3], "%d", &cnt);
+			if( !strcmp(command[4],"true") )
+				value=true;
+
+			bitmap_scan(Bitmap[index], start, cnt, value);	
+		}
+
+		//BITMAP_SET_ALL
+		else if( !strcmp( command[0], "bitmap_set_all") && token_cnt== 3){
+			int index = command[1][2]-'0';
+			bool value=false;
+			
+			if( !strcmp(command[2],"true") )
+				value=true;
+
+			bitmap_set_all(Bitmap[index], value);
+		}
+
+		//BITMAP_SET_MULTIPLE
+		else if( !strcmp( command[0], "bitmap_set_multiple") && token_cnt==5){
+			int index = command[1][2]-'0';
+			unsigned start, cnt;
+			bool value=false;
+
+			sscanf(command[2], "%d", &start);
+			sscanf(command[3], "%d", &cnt);
+			if( !strcmp(command[4],"true") )
+				value=true;
+			bitmap_set_multiple(Bitmap[index], start, cnt, value);
+		}
+
+		//BITMAP_SET
+		else if( !strcmp( command[0], "bitmap_set") && token_cnt==4){
+			int index = command[1][2]-'0';
+			unsigned bit_idx;
+			bool value =false;
+
+			sscanf(command[2], "%d", &bit_idx);
+			if( !strcmp(command[3],"true") )
+				value=true;
+			bitmap_set(Bitmap[index],bit_idx, value);
+		}
+
+		//BITMAP_SIZE
+		else if( !strcmp( command[0], "bitmap_size") && token_cnt==2){
+			int index = command[1][2]-'0';
+			size_t size = bitmap_size(Bitmap[index]);	
+			printf("%u\n", (unsigned)size);
+		}
+
+		//BITMAP_TEST
+		else if( !strcmp( command[0], "bitmap_test") && token_cnt==3){
+			int index = command[1][2]-'0';
+			unsigned idx;
+
+			sscanf(command[2], "%d", &idx);
+			if(bitmap_test(Bitmap[index], idx))
+				printf("true\n");
+			else
+				printf("false\n");
+			
+		}
+	
 	}
 
 	return 0;
