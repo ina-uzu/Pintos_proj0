@@ -97,6 +97,7 @@ int main(){
 			int index = command[1][4]-'0';
 			printf("%d\n", (int)list_size(&List[index]));
 		}
+
 		//LIST_INSERT
 		else if( !strcmp(command[0], "list_insert") && token_cnt==4){
 			int index= command[1][4]-'0';
@@ -229,6 +230,37 @@ int main(){
 	
 		}
 
+		//LIST_REMOVE
+		else if( !strcmp(command[0], "list_remove") && token_cnt==3){
+			int index = command[1][4]-'0';
+			int node_index, cur=0;
+			sscanf(command[2], "%d", &node_index);
+
+			//Pop back
+			if( node_index == (int)list_size(&List[index])-1)
+				list_pop_back(&List[index]);
+
+			struct list_elem* e;
+			for( e= list_begin(&List[index]); e!= list_end(&List[index]); e= list_next(e)){
+				if(cur==node_index){
+					list_remove(e);
+					break;
+				}
+				cur++;
+			}
+		}
+
+		//LIST_REVERSE
+		else if( !strcmp(command[0], "list_reverse") && token_cnt==2){
+			int index = command[1][4]-'0';
+			list_reverse(&List[index]);
+		}
+
+		//LIST_SORT
+		else if( !strcmp(command[0], "list_sort") && token_cnt==2){
+			int index = command[1][4]-'0';
+			list_sort(&List[index], list_less, NULL);
+		}
 	}
 
 	return 0;
