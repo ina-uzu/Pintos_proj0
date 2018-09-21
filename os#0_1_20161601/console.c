@@ -8,8 +8,9 @@
 
 char** tokenize_str(char* str, int* token_cnt);
 struct list_elem* n_th_elem(int index, int node_index);
-	
+
 struct list List[10];
+struct bitmap* Bitmap[10];
 
 struct list_node{
 	struct list_elem elem;
@@ -40,15 +41,23 @@ int main(){
 		}
 
 		//CREATE
-		if( !strcmp(command[0], "create")&& token_cnt==3 ){
+		if( !strcmp(command[0], "create")){
+			//LIST
 			if( !strcmp(command[1], "list")){
 				if(obj_cnt<=10){
 					type=LIST;
-					list_init(&List[obj_cnt]);	
-					obj_cnt++;
+					list_init(&List[obj_cnt++]);	
 				}
-				else{
-					printf("Maximum Number of List is 10\n");
+			}
+
+			//BITMAP
+			else if( !strcmp( command[1], "bitmap") && token_cnt==4){
+
+				if(obj_cnt<=10){
+					type=BITMAP;
+					unsigned len;
+					sscanf(command[3], "%u", &len);
+					Bitmap[obj_cnt++] = bitmap_create((size_t)len);
 				}
 			}
 		}
@@ -68,9 +77,11 @@ int main(){
 
 		//DUMPDATA
 		else if( !strcmp(command[0], "dumpdata")&& token_cnt==2){
+			int index;
+
 			//LIST
 			if(type==LIST){
-				int index=command[1][4]-'0';
+				index=command[1][4]-'0';
 
 				if(!list_empty(&List[index])){
 					struct list_elem* e;
@@ -81,6 +92,27 @@ int main(){
 					}
 					printf("\n");
 				}
+			}
+
+			//BITMAP
+			else if(type==BITMAP){
+				index= command[1][2]-'0';
+
+				if( Bitmap[index]!=NULL){
+					size_t cnt = bitmap_size(Bitmap[index]);
+					struct bitmap* bm = Bitmap[index];
+					size_t i;
+
+					/*
+					   for(i=0; i<cnt; i++){
+					   if( bit&1)
+					   printf("1");
+					   else
+					   printf("0");
+					   bit>>1;
+					   }*/
+				}
+
 			}
 		}
 
@@ -106,12 +138,12 @@ int main(){
 			sscanf(command[2], "%d", &node_index);
 			sscanf(command[3], "%d", &node_data);
 
-			
+
 			//Create new list item
 			struct list_elem* new_elem = (struct list_elem*)malloc(sizeof(struct list_elem));
 			struct list_node* node = list_entry(new_elem, struct list_node, elem);
 			node->data = node_data;
-		
+
 			//Push back
 			if((unsigned)list_size(&List[index])-1<node_index || list_empty(&List[index])){
 				list_push_back(&List[index],new_elem);
@@ -123,13 +155,12 @@ int main(){
 				list_push_front(&List[index],new_elem);
 				continue;
 			}
-			
+
 			int cur= 0;
 			struct list_elem* e;
 			for(e = list_begin(&List[index]); e!=list_end(&List[index]); e = list_next(e)){
 				if(cur==node_index){
-					list_insert(e, new_elem);		
-					
+					list_insert(e, new_elem);			
 					break;
 				}
 				cur++;
@@ -142,14 +173,14 @@ int main(){
 			int index = command[1][4]-'0';
 			int node_data;
 			sscanf(command[2], "%d", &node_data);
-			
+
 			//Create new list item
 			struct list_elem* new_elem = (struct list_elem*)malloc(sizeof(struct list_elem));
 			struct list_node* node = list_entry(new_elem, struct list_node, elem);
 			node->data = node_data;
-		
+
 			list_insert_ordered(&List[index],new_elem, list_less, NULL); 
-		
+
 		}
 
 		//LIST_PUSH_BACK
@@ -213,7 +244,7 @@ int main(){
 				printf("%d\n", node->data);
 		}
 
-		
+
 		//LIST_MIN
 		else if( !strcmp(command[0], "list_min") && token_cnt ==2){
 			int index = command[1][4]-'0';
@@ -228,7 +259,7 @@ int main(){
 			struct list_elem* e = list_max(&List[index], list_less, NULL);
 			struct list_node* node = list_entry(e, struct list_node, elem);
 			printf("%d\n", node->data);
-	
+
 		}
 
 		//LIST_REMOVE
@@ -266,7 +297,7 @@ int main(){
 
 			struct list_elem* e, *e_before=NULL;
 			struct list_elem *e_first=NULL, *e_last=NULL;
-			
+
 			e_before = n_th_elem(index1, before);
 			e_first = n_th_elem(index2, first);
 			e_last = n_th_elem(index2, last);
@@ -289,11 +320,63 @@ int main(){
 
 			if( token_cnt==2)
 				list_unique(&List[index1], NULL, list_less, NULL);
-			
+
 			else{
 				index2=command[2][4]-'0';
 				list_unique(&List[index1], &List[index2], list_less, NULL);
 			}
+
+		}
+
+		//BITMAP_MARK
+		else if( !strcmp(command[0], "bitmap_mark") && token_cnt==3){
+			int index = command[1][2]-'0';
+			unsigned bit;
+			sscanf(command[2], "%d", &bit);
+			bitmap_mark(Bitmap[index], (size_t)bit);
+		}
+
+		//BITMAP_ALL
+		else if( !strcmp(command[0], "bitmap_all") && token_cnt==4){
+			int index = command[1][2]-'0';
+			unsigned start, cnt;
+			sscanf(command[2], "%d", &start);
+			sscanf(command[3], "%d", &cnt);
+			
+			if(bitmap_all(Bitmap[index], (size_t)start, (size_t)cnt))
+				printf("true\n");
+			else
+				printf("false\n");
+		}
+
+		//BITMAP_ANY
+		else if( !strcmp( command[0], "bitmap_any") && token_cnt==4){
+			int index = command[1][2]-'0';
+			unsigned start, cnt;
+			sscanf(command[2], "%d", &start);
+			sscanf(command[3], "%d", &cnt);
+	
+			if(bitmap_any(Bitmap[index], (size_t)start, (size_t)cnt))
+				printf("true\n");
+			else
+				printf("false\n");
+		
+		}
+
+		//BITMAP_CONTAINS
+		else if( !strcmp(command[0], "bitmap_contains") && token_cnt==5){
+			int index = command[1][2]-'0';
+			unsigned start, cnt;
+			bool value=false;
+			sscanf(command[2], "%d", &start);
+			sscanf(command[3], "%d", &cnt);
+			if( !strcmp(command[4],"true") )
+				value=true;
+			
+			if(bitmap_contains(Bitmap[index], (size_t)start, (size_t)cnt, value) )
+				printf("true\n");
+			else
+				printf("false\n");
 
 		}
 	}
@@ -344,7 +427,7 @@ char** tokenize_str(char* str, int* token_cnt){
 
 struct list_elem* n_th_elem(int index, int node_index){
 	int cur=0;
-	
+
 	struct list_elem* e;
 	for( e= list_begin(&List[index]); e!= list_end(&List[index]); e= list_next(e)){
 		if(cur==node_index){
@@ -352,13 +435,7 @@ struct list_elem* n_th_elem(int index, int node_index){
 		}
 		cur++;
 	}
-	
+
 	return e;
 
-}
-struct list_elem* create_list_node(int data){
-	struct list_elem* e= (struct list_elem*)malloc(sizeof(struct list_elem));
-	struct list_node* node = list_entry(e,struct list_node, elem);
-	node->data;
-	return e;
 }
