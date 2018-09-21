@@ -7,6 +7,7 @@
 #include "console.h"
 
 char** tokenize_str(char* str, int* token_cnt);
+struct list_elem* create_list_node(int data);
 
 struct list List[10];
 
@@ -14,6 +15,12 @@ struct list_node{
 	struct list_elem elem;
 	int data;
 };
+
+static bool list_less(const struct list_elem *a, const struct list_elem *b, void *aux){
+	struct list_node* anode =list_entry(a,struct list_node,elem);
+	struct list_node* bnode =list_entry(b,struct list_node,elem);
+	return anode->data < bnode ->data;
+}
 
 int main(){
 	int type;
@@ -113,6 +120,21 @@ int main(){
 				cur++;
 			}
 
+		}
+
+		//LIST_INSERT_ORDERD
+		else if( !strcmp(command[0], "list_insert_ordered") && token_cnt==3){
+			int index = command[1][4]-'0';
+			int node_data;
+			sscanf(command[2], "%d", &node_data);
+			
+			//Create new list item
+			struct list_elem* new_elem = (struct list_elem*)malloc(sizeof(struct list_elem));
+			struct list_node* node = list_entry(new_elem, struct list_node, elem);
+			node->data = node_data;
+		
+			list_insert_ordered(&List[index],new_elem, list_less, NULL); 
+		
 		}
 
 		//LIST_PUSH_BACK
@@ -229,4 +251,11 @@ char** tokenize_str(char* str, int* token_cnt){
 	}
 
 	return tokens;
+}
+
+struct list_elem* create_list_node(int data){
+	struct list_elem* e= (struct list_elem*)malloc(sizeof(struct list_elem));
+	struct list_node* node = list_entry(e,struct list_node, elem);
+	node->data;
+	return e;
 }
