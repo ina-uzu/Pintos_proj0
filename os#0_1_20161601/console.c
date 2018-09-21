@@ -22,8 +22,6 @@ int main(){
 	char command_str[256];	//사용자로부터 입력받는 명령어
 	char** command;	//command_str을 공백단위로 쪼갠 문자열 배열
 
-	printf("hello ina!\n");
-
 	while(1){	
 
 		fgets(command_str,sizeof(command_str),stdin);	
@@ -31,7 +29,6 @@ int main(){
 
 		//QUIT
 		if(!strcmp(command[0],"quit")){
-			printf("Bye~ ina!\n");
 			break;
 		}
 
@@ -87,33 +84,35 @@ int main(){
 			sscanf(command[2], "%d", &node_index);
 			sscanf(command[3], "%d", &node_data);
 
-			if(!(unsigned)list_size(&List[index])<=node_index){
-
-				// create new node
-				struct list_elem* new_elem = (struct list_elem*)malloc(sizeof(struct list_elem));
-				struct list_node* node = list_entry(new_elem, struct list_node, elem);
-				node->data = node_data;
-
-
-				// push_front
-				if(node_index==0)
-					list_push_front(&List[index],new_elem);		
-
-				else if( node_index== ){
-					
-				}
-				else{
-
-					// get 'BEFORE' list_elem
-					struct list_elem* e;
-					int i=0;
-					for(e= list_begin(&List[index]); e!=list_end(&List[index]) || i<node_index; e = list_next(e) ){
-
-						i++;
-					}
-					list_insert();
-				}
+			
+			//Create new list item
+			struct list_elem* new_elem = (struct list_elem*)malloc(sizeof(struct list_elem));
+			struct list_node* node = list_entry(new_elem, struct list_node, elem);
+			node->data = node_data;
+		
+			//Push back
+			if((unsigned)list_size(&List[index])-1<node_index || list_empty(&List[index])){
+				list_push_back(&List[index],new_elem);
+				continue;
 			}
+
+			//Push front
+			if(node_index==0){
+				list_push_front(&List[index],new_elem);
+				continue;
+			}
+			
+			int cur= 0;
+			struct list_elem* e;
+			for(e = list_begin(&List[index]); e!=list_end(&List[index]); e = list_next(e)){
+				if(cur==node_index){
+					list_insert(e, new_elem);		
+					
+					break;
+				}
+				cur++;
+			}
+
 		}
 
 		//LIST_PUSH_BACK
