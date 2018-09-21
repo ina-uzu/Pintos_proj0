@@ -384,8 +384,7 @@ struct bitmap* bitmap_expand(struct bitmap* bitmap, int size){
 
 	//사이즈 늘린 새로운 bitmap 생성하고, 기존의 bits값  복사
 	new_bitmap = bitmap_create((size_t)size + bitmap->bit_cnt);
-	*(new_bitmap->bits) = *(bitmap->bits);
-
-	//기존의 bitmap NULL?
+	*new_bitmap->bits = *bitmap->bits;
+	
 	return new_bitmap;
 }

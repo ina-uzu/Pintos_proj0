@@ -4,7 +4,7 @@ testlib : console.o list.o bitmap.o hash.o
 	gcc -g -o testlib console.o list.o bitmap.o hash.o
 
 console.o : console.c console.h list.h bitmap.h hash.h
-	gcc -c console.c 
+	gcc -c -w console.c 
 
 list.o : list.h debug.h
 	gcc -c list.c
