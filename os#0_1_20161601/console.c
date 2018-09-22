@@ -373,6 +373,12 @@ int main(){
 			list_swap(n_th_elem(index, node1), n_th_elem(index, node2));
 		}
 
+		//LIST_SHUFFLE
+		else if( !strcmp( command[0], "list_shuffle") && token_cnt==2){
+			int index = command[1][4]-'0';
+			list_shuffle(&List[index]);
+		}
+
 		//LIST_UNIQUE
 		else if( !strcmp(command[0], "list_unique")&& ( token_cnt==3 || token_cnt==2)){
 			int index1=command[1][4]-'0';
@@ -735,5 +741,4 @@ struct list_elem* n_th_elem(int index, int node_index){
 	}
 
 	return e;
-
 }

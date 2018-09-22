@@ -1,5 +1,6 @@
 #include "list.h"
 #include <assert.h>	// Instead of	#include "../debug.h"
+#include <time.h>
 #define ASSERT(CONDITION) assert(CONDITION)	// patched for proj0-2
 
 /* Our doubly linked lists have two header elements: the "head"
@@ -572,6 +573,36 @@ void list_swap(struct list_elem* a, struct list_elem* b){
 
 
 void list_shuffle(struct list* list){
-//	int list_size = static_cast<int>(list_size(list));
-
+	unsigned size = (unsigned)(list_size(list));
+	unsigned shuffle_idx, i;
+	
+	if(list_empty(list))
+		return;
+	struct list_elem* e;
+	for(i=0; i<size; i++){
+		srand(time(NULL));
+		shuffle_idx=rand()%size;
+		struct list_elem* e = list_n_th_elem(list, i);
+		struct list_elem* swap_elem = list_n_th_elem(list, shuffle_idx);
+		list_swap(e,swap_elem);
+	}
 }
+
+
+struct list_elem* list_n_th_elem(struct list* list, unsigned idx){
+	int cur=0;
+
+	if( list_empty(list))
+		return NULL;
+
+	struct list_elem* e;
+	for( e= list_begin(list); e!= list_end(list); e= list_next(e)){
+		if(cur==idx){
+			break;
+		}
+		cur++;
+	}
+
+	return e;
+}
+
